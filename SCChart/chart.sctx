@@ -1,0 +1,28 @@
+scchart Pacemaker {
+  input bool AS, VS
+  output bool AP, VP
+  int AVIcounter
+
+  initial state WaitA {
+    entry do AP = 0
+    entry do VP = 0
+    }
+    if AS || AP go to AVI
+    
+    state AVI {
+      region{
+        initial state wVS{
+        entry do AVIcounter = 0
+        during do AVIcounter++
+        }
+
+        
+        if VS abort to dVS
+        if AVIcounter == 300 go to dVS
+        final state dVS
+    }
+    }
+ 
+  }
+ 
+ 
