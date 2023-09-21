@@ -2,10 +2,16 @@ scchart Pacemaker {
   input bool AS, VS
   output signal AP, VP
   bool AVI, PVARP, VRP, AEI, LRI  , URI
-  clock cAVI, cPVARP, cVRP, cAEI, cLRI, cURI
   signal eAVI, ePVARP, eVRP, eAEI, eLRI, eURI
+  host "int" AVI_Constraint = `AVI_VALUE`
+  host "int" PVARP_Constraint = `PVARP_VALUE`
+  host "int" VRP_Constraint = `VRP_VALUE`
+  host "int" AEI_Constraint = `AEI_VALUE`
+  host "int" LRI_Constraint = `LRI_VALUE`
+  host "int" URI_Constraint = `URI_VALUE`
 
   region AVI {
+    clock cAVI = 0
     initial state iAVI {
       entry do AVI = false
       exit do AVI = true
@@ -16,11 +22,12 @@ scchart Pacemaker {
       entry do cAVI = 0
     }
 
-    if cAVI >= 150 && !URI do VP; eAVI go to iAVI
+    if cAVI >= AVI_Constraint && !URI do VP; eAVI go to iAVI
     if VS do eAVI go to iAVI
   }
 
   region PVARP {
+     clock cPVARP = 0
     initial state wPVARP {
       entry do PVARP = false
       exit do PVARP = true
@@ -32,11 +39,12 @@ scchart Pacemaker {
       entry do cPVARP = 0
     }
 
-    if cPVARP >= 250 go to wPVARP
+    if cPVARP >= PVARP_Constraint go to wPVARP
 
   }
 
-  region VRP {
+  region VRP { 
+    clock cVRP = 0
     initial state wVRP {
       entry do VRP = false
       exit do VRP = true
@@ -48,10 +56,11 @@ scchart Pacemaker {
       entry do cVRP = 0
     }
 
-    if cVRP >= 320 go to wVRP
+    if cVRP >= VRP_Constraint go to wVRP
   }
 
   region AEI {
+    clock cAEI = 0
     initial state wAEI {
       entry do AEI = false
       exit do AEI = true
@@ -63,11 +72,12 @@ scchart Pacemaker {
       entry do cAEI = 0
     }
 
-    if cAEI >= 150 do AP go to wAEI
+    if cAEI >= AEI_Constraint do AP go to wAEI
     if AS do eAEI go to wAEI
   }
 
   region LRI {
+    clock cLRI = 0
     initial state wLRI {
       entry do LRI = false
       exit do LRI = true
@@ -82,6 +92,7 @@ scchart Pacemaker {
   }
 
   region URI {
+    clock cURI = 0
     initial state wURI {
       entry do URI = false
       exit do URI = true
