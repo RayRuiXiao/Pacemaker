@@ -1,0 +1,105 @@
+scchart DDDPacemaker {
+	input signal pure ASense, VSense, AVITO, PVARPTO, VRPTO, AEITO, LRITO, URITO
+	output signal pure APace, VPace
+	output signal pure AVI_start, PVARP_start, VRP_start, AEI_start, LRI_start, URI_start
+	output signal pure AVI_stop, AEI_stop, LRI_stop
+
+	initial state top {
+		signal pure PVARP_ex, VRP_ex, URI_ex
+
+		region AVI {
+			initial state intState
+			if APace go to commit1
+			if ASense go to commit1
+
+			connector state commit1
+			immediate do AVI_start go to waitAVI
+
+			state waitAVI
+			if VSense go to commit2
+			if VPace go to commit2
+			if AVITO go to waitURI
+
+			connector state commit2
+			immediate do AVI_stop go to waitPVARP
+
+			state waitPVARP
+			if PVARP_ex go to intState
+
+			state waitURI
+			if URI_ex do VPace go to intState
+		}
+
+		region PVARP {
+			initial state idle
+			if VSense go to commit1
+			if VPace go to commit1
+
+			connector state commit1
+			immediate do PVARP_start go to waitPVARP
+
+			state waitPVARP
+			if PVARPTO do PVARP_ex go to idle
+		}
+
+		region VRP {
+			initial state idle
+			if VSense go to commit1
+			if VPace go to commit1
+
+			connector state commit1
+			immediate do VRP_start go to waitVRP
+
+			state waitVRP
+			if VRPTO do VRP_ex go to idle
+		}
+
+		region AEI {
+			initial state intState
+			if VSense go to commit1
+			if VPace go to commit1
+
+			connector state commit1
+			immediate do AEI_start go to waitAEI
+
+			state waitAEI
+			if ASense go to commit2
+			if APace go to commit2
+			if AEITO do APace go to intState
+
+			connector state commit2
+			immediate do AEI_stop go to waitVRP
+
+			state waitVRP
+			if VRP_ex go to intState
+		}
+
+		region LRI {
+			state waitVRP
+			if VRP_ex go to waitLRI
+
+			initial state waitLRI
+			if VSense go to commit1
+			if VPace go to commit1
+			if LRITO do VPace go to intState
+
+			connector state commit1
+			immediate do LRI_stop go to intState
+
+			state intState
+			do LRI_start go to waitVRP
+		}
+
+		region URI {
+			initial state init
+			if VSense go to commit1
+			if VPace go to commit1
+
+			connector state commit1
+			immediate do URI_start go to waitURI
+
+			state waitURI
+			if URITO do URI_ex go to init
+		}
+	}
+}

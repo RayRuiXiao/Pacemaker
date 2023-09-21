@@ -1,28 +1,100 @@
 scchart Pacemaker {
   input bool AS, VS
-  output bool AP, VP
-  int AVIcounter
+  output signal AP, VP
+  bool AVI, PVARP, VRP, AEI, LRI  , URI
+  clock cAVI, cPVARP, cVRP, cAEI, cLRI, cURI
+  signal eAVI, ePVARP, eVRP, eAEI, eLRI, eURI
 
-  initial state WaitA {
-    entry do AP = 0
-    entry do VP = 0
+  region AVI {
+    initial state iAVI {
+      entry do AVI = false
+      exit do AVI = true
     }
-    if AS || AP go to AVI
-    
-    state AVI {
-      region{
-        initial state wVS{
-        entry do AVIcounter = 0
-        during do AVIcounter++
-        }
+    if AS && !PVARP go to dAVI
 
-        
-        if VS abort to dVS
-        if AVIcounter == 300 go to dVS
-        final state dVS
+    state dAVI {
+      entry do cAVI = 0
     }
-    }
- 
+
+    if cAVI >= 150 && !URI do VP; eAVI go to iAVI
+    if VS do eAVI go to iAVI
   }
+
+  region PVARP {
+    initial state wPVARP {
+      entry do PVARP = false
+      exit do PVARP = true
+    }
+
+    if eAVI go to dPVARP
+
+    state dPVARP {
+      entry do cPVARP = 0
+    }
+
+    if cPVARP >= 250 go to wPVARP
+
+  }
+
+  region VRP {
+    initial state wVRP {
+      entry do VRP = false
+      exit do VRP = true
+    }
+
+    if eAVI go to dVRP
+
+    state dVRP {
+      entry do cVRP = 0
+    }
+
+    if cVRP >= 320 go to wVRP
+  }
+
+  region AEI {
+    initial state wAEI {
+      entry do AEI = false
+      exit do AEI = true
+    }
+
+    if eAVI go to dAEI
+
+    state dAEI {
+      entry do cAEI = 0
+    }
+
+    if cAEI >= 150 do AP go to wAEI
+    if AS do eAEI go to wAEI
+  }
+
+  region LRI {
+    initial state wLRI {
+      entry do LRI = false
+      exit do LRI = true
+    }
+
+    if eAVI go to dLRI
+
+    state dLRI {
+      entry do cLRI = 0
+    }
+
+  }
+
+  region URI {
+    initial state wURI {
+      entry do URI = false
+      exit do URI = true
+    }
+
+    if eAVI go to dURI
+
+    state dURI {
+      entry do cURI = 0
+    }
+
+
+  }
+}
  
  
