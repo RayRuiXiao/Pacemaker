@@ -1,11 +1,11 @@
 #resource "timing.h"
 #hostcode-c "#include \"timing.h\""
+
 @ClocksUseSD
 scchart Pacemaker {
   input bool AS, VS
   output signal AP, VP
   signal AVI, PVARP, VRP, AEI, LRI, URI
-  signal eAVI, ePVARP, eVRP, eAEI, eLRI = false, eURI
   host "int" AVI_Constraint = `AVI_VALUE`
   host "int" PVARP_Constraint = `PVARP_VALUE`
   host "int" VRP_Constraint = `VRP_VALUE`
@@ -15,101 +15,84 @@ scchart Pacemaker {
 
   region AVI {
     clock cAVI = 0
-    
+
     initial state wAVI
-        
-      if (AS || AP) && !PVARP go to dAVI
+    if (AS || AP) && !PVARP go to dAVI
 
     state dAVI {
       entry do cAVI = 0
       during do AVI
-      exit do eAVI
     }
-
-      if (cAVI >= AVI_Constraint && !URI) && !LRI do VP go to wAVI
-      if VS && !VRP go to wAVI
+    if (cAVI >= AVI_Constraint && !URI) && !LRI do VP go to wAVI
+    if VS && !VRP go to wAVI
   }
 
   region PVARP {
     clock cPVARP = 0
-     
-    initial state wPVARP
 
-      if VS || VP go to dPVARP
+    initial state wPVARP
+    if VS || VP go to dPVARP
 
     state dPVARP {
       entry do cPVARP = 0
       during do PVARP
-      exit do ePVARP
     }
-
-      if cPVARP >= PVARP_Constraint go to wPVARP
-
+    if cPVARP >= PVARP_Constraint go to wPVARP
   }
 
- region VRP { 
-   clock cVRP = 0
-   initial state wVRP
+  region VRP {
+    clock cVRP = 0
 
-   if VS || VP go to dVRP
+    initial state wVRP
+    if VS || VP go to dVRP
 
-   state dVRP {
-     entry do cVRP = 0
-     during do VRP
-     exit do eVRP
-   }
+    state dVRP {
+      entry do cVRP = 0
+      during do VRP
+    }
+    if cVRP >= VRP_Constraint go to wVRP
+  }
 
-   if cVRP >= VRP_Constraint go to wVRP
- }
+  region AEI {
+    clock cAEI = 0
 
- region AEI {
-   clock cAEI = 0
-   initial state wAEI
+    initial state wAEI
+    if (VS || VP) && !VRP go to dAEI
 
-   if (VS || VP) && !VRP go to dAEI
+    state dAEI {
+      entry do cAEI = 0
+      during do AEI
+    }
+    if cAEI >= AEI_Constraint do AP go to wAEI
+    if AS && !PVARP go to wAEI
+  }
 
-   state dAEI {
-     entry do cAEI = 0
-     during do AEI
-     exit do eAEI
-   }
+  region LRI {
+    clock cLRI = 0
 
-   if cAEI >= AEI_Constraint do AP go to wAEI
-   if AS && !PVARP go to wAEI
- }
+    initial state wLRI
+    if (VP || VS) && !VRP go to dLRI
 
- region LRI {
-   clock cLRI = 0
-   initial state wLRI
+    state dLRI {
+      entry do cLRI = 0
+      during do LRI
+    }
+    if (VS || VP) && !VRP go to dLRI
+    if cLRI >= LRI_Constraint do VP go to dLRI
+  }
 
-   if VP || VS go to dLRI
+  region URI {
+    clock cURI = 0
 
-   state dLRI {
-     entry do cLRI = 0
-     during do LRI
-     exit do eLRI
-   }
-   
-   if (VS || VP) && !VRP go to dLRI
-   if cLRI >= LRI_Constraint do VP go to dLRI
+    initial state wURI
+    if (VS || VP) && !VRP go to dURI
 
- }
-
- region URI {
-   clock cURI = 0
-   initial state wURI
-
-   if (VS || VP) && !VRP go to dURI
-
-   state dURI {
-     entry do cURI = 0
-     during do URI
-     exit do eURI
-   }
-   
-   if cURI >= URI_Constraint go to wURI
- }
- 
+    state dURI {
+      entry do cURI = 0
+      during do URI
+    }
+    if cURI >= URI_Constraint go to wURI
+  }
 }
  
  
