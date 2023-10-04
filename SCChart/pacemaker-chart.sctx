@@ -23,7 +23,7 @@ scchart Pacemaker {
       entry do cAVI = 0
       during do AVI
     }
-    if (cAVI >= AVI_Constraint && !URI) && !LRI do VP go to wAVI
+    if (cAVI >= AVI_Constraint && !URI) || !LRI do VP go to wAVI
     if VS && !VRP go to wAVI
   }
 
