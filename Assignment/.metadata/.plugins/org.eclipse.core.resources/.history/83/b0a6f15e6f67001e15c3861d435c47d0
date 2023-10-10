@@ -1,0 +1,12 @@
+/*
+ * timers.c
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+#include "timers.h"
+#include "sys/alt_alarm.h"
+
+alt_alarm timer;
+
+

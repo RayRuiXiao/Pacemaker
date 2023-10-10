@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <system.h> // to use the symbolic names
+#include <alt_types.h> // alt_u32 is a kind of alt_types
+#include <altera_avalon_pio_regs.h> // to use PIO functions
+
+#include "uart.h"
+
+void setup_keys();
+void key_interrupt(void* context, alt_u32 id);
+
+int main()
+{
+	printf("Hello from Nios II!\n");
+
+	// start a non blocking UART with read and write
+	uart = open(UART_NAME,(O_NONBLOCK | O_RDWR));
+
+	setup_keys();
+	while(1) {
+		check_uart();
+	}
+
+	// close the non blocking UART with read and write
+	close(uart);
+	return 0;
+}
+
+
+void key_interrupt(void* context, alt_u32 id) {
+	int* temp = (int*) context; // need to cast the context first before using it
+	(*temp) = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
+	// clear the edge capture register
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
+	printf("button: %i\n", *temp);
+}
+
+void setup_keys(){
+	int keyValue = 1;
+	void* contextKeyInterrupt =(void*) &keyValue; // cast before passing to ISR
+
+
+	// clears the edge capture register
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
+
+	// enable interrupts for all buttons
+	IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
+
+	// register the ISR
+	alt_irq_register(KEYS_IRQ, contextKeyInterrupt, key_interrupt);
+}
+

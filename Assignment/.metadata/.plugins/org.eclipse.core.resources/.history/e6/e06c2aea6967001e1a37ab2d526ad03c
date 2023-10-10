@@ -1,0 +1,24 @@
+/*
+ * uart.c
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+
+
+#include "uart.h"
+
+void check_uart(){
+	if (read(uart,byte,1) > 0){
+		if (*byte == 'A'){
+			printf("ASense UART\n");
+		}
+		else if (*byte == 'V'){
+			printf("VSense UART\n");
+		}
+		else{
+			printf("Vn2\n");
+		}
+	}
+}
+

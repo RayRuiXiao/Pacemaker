@@ -1,0 +1,44 @@
+/*
+ * timers.c
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+#include "timers.h"
+
+alt_alarm timer;
+
+alt_u32 vp_light_timer_isr(void* context){
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0b00); //turn off LEDs
+	printf("APLEDExpired\r\n");
+	return 0;
+}
+
+alt_u32 ap_light_timer_isr(void* context){
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0b00); //turn off LEDs
+	printf("APLEDExpired\r\n");
+	return 0;
+}
+
+
+
+void vp_light_timer(){
+	void* context = 0;
+
+
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0b11);
+	printf("timer started");
+	alt_alarm_start(&timer, LED_TIMEOUT, APLEDTimerISR, context);
+
+}
+
+void ap_light_timer(){
+	void* context = 0;
+
+
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0b11);
+	printf("timer started");
+	alt_alarm_start(&timer, LED_TIMEOUT, APLEDTimerISR, context);
+
+}
+

@@ -1,0 +1,17 @@
+/*
+ * timers.c
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+#include "timers.h"
+
+alt_alarm timer;
+
+
+void test_timer(){
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0b10);
+	printf("timer started");
+
+}
+

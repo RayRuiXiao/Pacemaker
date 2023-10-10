@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Oct 10, 2023 11:40:52 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1696934452954</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>Oct 11, 2023 1:01:12 AM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1696939272495</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>C:\Users\joshu\Documents\GitHub\COMPSYS-303-Pacemaker\Assignment\software\Pacemaker_bsp</BspGeneratedLocation>
         <BspSettingsFile>.\settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\nios2_system.sopcinfo</SopcDesignFile>

@@ -1,0 +1,19 @@
+/*
+ * uart.h
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+
+#ifndef UART_H_
+#define UART_H_
+
+#include <stdio.h>
+#include <fcntl.h>
+
+FILE* uart;
+char* byte;
+void check_uart();
+
+
+#endif /* UART_H_ */
