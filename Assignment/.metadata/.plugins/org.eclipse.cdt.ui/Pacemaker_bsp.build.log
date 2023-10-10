@@ -1,0 +1,6 @@
+23:40:54 **** Clean-only build of configuration Nios II for project Pacemaker_bsp ****
+make clean 
+[BSP clean complete]
+
+23:40:54 Build Finished (took 252ms)
+

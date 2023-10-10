@@ -1,0 +1,6 @@
+23:40:56 **** Clean-only build of configuration Nios II for project Pacemaker ****
+make clean 
+[Pacemaker clean complete]
+
+23:40:56 Build Finished (took 216ms)
+
