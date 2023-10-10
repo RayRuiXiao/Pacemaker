@@ -1,0 +1,15 @@
+/*
+ * lcd.c
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+
+FILE *lcd;
+
+setup_lcd(){
+
+	lcd = fopen(LCD_NAME, "w");
+}
+
+

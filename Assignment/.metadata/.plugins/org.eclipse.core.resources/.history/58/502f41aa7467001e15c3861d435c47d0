@@ -1,0 +1,17 @@
+/*
+ * lcd.h
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+
+#ifndef LCD_H_
+#define LCD_H_
+
+#include <system.h>
+
+setup_lcd();
+write_to_lcd( const char *string);
+close_lcd();
+
+#endif /* LCD_H_ */

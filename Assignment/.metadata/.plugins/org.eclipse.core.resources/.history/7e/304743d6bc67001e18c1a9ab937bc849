@@ -1,0 +1,31 @@
+/*
+ * lcd.c
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+#include "lcd.h"
+
+FILE *lcd;
+
+void setup_lcd(){
+	lcd = fopen(LCD_NAME, "w");
+}
+
+void write_to_lcd(const char *format, ...){
+	#define ESC 27
+	#define CLEAR_LCD_STRING "[2J"
+	fprintf(lcd, "%c%s", ESC, CLEAR_LCD_STRING);
+
+	// Use variadic arguments to print the formatted string
+	va_list args;
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+}
+
+void close_lcd(){
+	fclose(lcd);
+}
+
+

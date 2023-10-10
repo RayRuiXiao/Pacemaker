@@ -1,0 +1,18 @@
+/*
+ * lcd.h
+ *
+ *  Created on: Oct 11, 2023
+ *      Author: joshu
+ */
+
+#ifndef LCD_H_
+#define LCD_H_
+
+#include <system.h>
+#include <altera_avalon_pio_regs.h>
+
+void setup_lcd();
+void write_to_lcd(const char *string);
+void close_lcd();
+
+#endif /* LCD_H_ */

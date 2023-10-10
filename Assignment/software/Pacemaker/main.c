@@ -15,6 +15,9 @@ int main()
 	// start a non blocking UART with read and write
 	setup_keys();
 	setup_uart();
+	setup_lcd();
+
+	write_to_lcd("hello \n%s %s", "joshua", "morley");
 
 	while(1) {
 		check_uart();
@@ -22,6 +25,7 @@ int main()
 
 	// close the non blocking UART with read and write
 	close_uart();
+	close_lcd();
 	return 0;
 }
 

@@ -1,6 +1,3 @@
-02:43:19 **** Clean-only build of configuration Nios II for project Pacemaker ****
+11:39:53 **** Clean-only build of configuration Nios II for project Pacemaker ****
 make clean 
 [Pacemaker clean complete]
-02:43:19 **** Clean-only build of configuration Nios II for project Pacemaker_bsp ****
-make clean 
-[BSP clean complete]

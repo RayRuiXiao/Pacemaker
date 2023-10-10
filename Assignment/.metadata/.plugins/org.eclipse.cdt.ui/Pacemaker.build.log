@@ -1,6 +1,6 @@
-02:43:19 **** Clean-only build of configuration Nios II for project Pacemaker ****
+11:39:53 **** Clean-only build of configuration Nios II for project Pacemaker ****
 make clean 
 [Pacemaker clean complete]
 
-02:43:19 Build Finished (took 192ms)
+11:39:53 Build Finished (took 144ms)
 
