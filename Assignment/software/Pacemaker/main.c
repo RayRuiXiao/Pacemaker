@@ -4,6 +4,9 @@
 #include <altera_avalon_pio_regs.h> // to use PIO functions
 
 #include "uart.h"
+#include "lcd.h"
+#include "timers.h"
+#include "sccharts.h"
 
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
@@ -20,8 +23,16 @@ int main()
 
 	write_to_lcd("hello \n%s %s", "joshua", "morley");
 
+	TickData tickData;
+	reset(&tickData);
+	tick(&tickData); // init tick
+
+
 	while(1) {
 		check_uart();
+
+
+
 	}
 
 	// close the non blocking UART with read and write
@@ -42,6 +53,13 @@ void key_interrupt(void* context, alt_u32 id) {
 	// clear the edge capture register
 	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
 	printf("button: %i\n", *temp);
+	if (*temp == 1){
+		vp_light_timer();
+	}
+	if (*temp == 2){
+		ap_light_timer();
+
+	}
 }
 
 void setup_keys(){

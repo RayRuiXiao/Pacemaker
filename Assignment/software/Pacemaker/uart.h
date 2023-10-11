@@ -12,6 +12,8 @@
 #include <system.h> // to use the symbolic names
 #include <fcntl.h>
 
+uint8
+
 void setup_uart();
 void check_uart();
 void close_uart();
