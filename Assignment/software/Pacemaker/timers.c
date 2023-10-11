@@ -14,13 +14,13 @@ int vp_timer_started = 0;
 int ap_timer_started = 0;
 
 alt_u32 vp_light_timer_isr(void* context){
-	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) & ~(1 << 0)));
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) & ~(1 << 0)));
 	vp_timer_started = 0;
 	return 0;
 }
 
 alt_u32 ap_light_timer_isr(void* context){
-	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) & ~(1 << 1)));
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) & ~(1 << 1)));
 	ap_timer_started = 0;
 	return 0;
 }
@@ -32,7 +32,7 @@ void vp_light_timer(){
 		vp_timer_started = 1;
 
 		void* context = 0;
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) | 1 << 0));
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) | 1 << 0));
 		alt_alarm_start(&timer_vp, LED_TIMEOUT, vp_light_timer_isr, context);
 	}
 
@@ -43,7 +43,7 @@ void ap_light_timer(){
 		ap_timer_started = 1;
 
 		void* context = 0;
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) | 1 << 1));
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) | 1 << 1));
 		alt_alarm_start(&timer_ap, LED_TIMEOUT, ap_light_timer_isr, context);
 	}
 

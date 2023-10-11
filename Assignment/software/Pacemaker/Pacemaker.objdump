@@ -987,8 +987,6 @@ int main()
 		check_uart();
   80042c:	08055380 	call	805538 <check_uart>
 
-
-
 	}
   800430:	003ffe06 	br	80042c <__alt_mem_onchip_mem+0xff7f842c>
 
@@ -1053,7 +1051,7 @@ alt_u32 timerISR(void* context){
   8004c0:	08053f00 	call	8053f0 <vp_light_timer>
 	}
 
-	return 1; // next tick is after 1ms
+	return 1; // next tick is a fter 1ms
   8004c4:	00800044 	movi	r2,1
 }
   8004c8:	e037883a 	mov	sp,fp
@@ -6595,14 +6593,14 @@ alt_u32 vp_light_timer_isr(void* context){
   805364:	df000115 	stw	fp,4(sp)
   805368:	df000104 	addi	fp,sp,4
   80536c:	e13fff15 	stw	r4,-4(fp)
-	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) & ~(1 << 0)));
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) & ~(1 << 0)));
   805370:	00804074 	movhi	r2,257
-  805374:	10842004 	addi	r2,r2,4224
+  805374:	10841c04 	addi	r2,r2,4208
   805378:	10c00037 	ldwio	r3,0(r2)
   80537c:	00bfff84 	movi	r2,-2
   805380:	1886703a 	and	r3,r3,r2
   805384:	00804074 	movhi	r2,257
-  805388:	10842004 	addi	r2,r2,4224
+  805388:	10841c04 	addi	r2,r2,4208
   80538c:	10c00035 	stwio	r3,0(r2)
 	vp_timer_started = 0;
   805390:	d0274915 	stw	zero,-25308(gp)
@@ -6621,14 +6619,14 @@ alt_u32 ap_light_timer_isr(void* context){
   8053ac:	df000115 	stw	fp,4(sp)
   8053b0:	df000104 	addi	fp,sp,4
   8053b4:	e13fff15 	stw	r4,-4(fp)
-	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) & ~(1 << 1)));
+	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) & ~(1 << 1)));
   8053b8:	00804074 	movhi	r2,257
-  8053bc:	10842004 	addi	r2,r2,4224
+  8053bc:	10841c04 	addi	r2,r2,4208
   8053c0:	10c00037 	ldwio	r3,0(r2)
   8053c4:	00bfff44 	movi	r2,-3
   8053c8:	1886703a 	and	r3,r3,r2
   8053cc:	00804074 	movhi	r2,257
-  8053d0:	10842004 	addi	r2,r2,4224
+  8053d0:	10841c04 	addi	r2,r2,4208
   8053d4:	10c00035 	stwio	r3,0(r2)
 	ap_timer_started = 0;
   8053d8:	d0274a15 	stw	zero,-25304(gp)
@@ -6658,13 +6656,13 @@ void vp_light_timer(){
 
 		void* context = 0;
   805410:	e03fff15 	stw	zero,-4(fp)
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) | 1 << 0));
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) | 1 << 0));
   805414:	00804074 	movhi	r2,257
-  805418:	10842004 	addi	r2,r2,4224
+  805418:	10841c04 	addi	r2,r2,4208
   80541c:	10800037 	ldwio	r2,0(r2)
   805420:	10c00054 	ori	r3,r2,1
   805424:	00804074 	movhi	r2,257
-  805428:	10842004 	addi	r2,r2,4224
+  805428:	10841c04 	addi	r2,r2,4208
   80542c:	10c00035 	stwio	r3,0(r2)
 		alt_alarm_start(&timer_vp, LED_TIMEOUT, vp_light_timer_isr, context);
   805430:	e1ffff17 	ldw	r7,-4(fp)
@@ -6700,13 +6698,13 @@ void ap_light_timer(){
 
 		void* context = 0;
   805484:	e03fff15 	stw	zero,-4(fp)
-		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE) | 1 << 1));
+		IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, (IORD_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE) | 1 << 1));
   805488:	00804074 	movhi	r2,257
-  80548c:	10842004 	addi	r2,r2,4224
+  80548c:	10841c04 	addi	r2,r2,4208
   805490:	10800037 	ldwio	r2,0(r2)
   805494:	10c00094 	ori	r3,r2,2
   805498:	00804074 	movhi	r2,257
-  80549c:	10842004 	addi	r2,r2,4224
+  80549c:	10841c04 	addi	r2,r2,4208
   8054a0:	10c00035 	stwio	r3,0(r2)
 		alt_alarm_start(&timer_ap, LED_TIMEOUT, ap_light_timer_isr, context);
   8054a4:	e1ffff17 	ldw	r7,-4(fp)
