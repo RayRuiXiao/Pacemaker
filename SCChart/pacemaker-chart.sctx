@@ -6,18 +6,12 @@ scchart Pacemaker {
   input bool AS, VS
   output signal AP, VP
   signal AVI, PVARP, VRP, AEI, LRI, URI
-  host "int" AVI_Constraint = 300
-  host "int" PVARP_Constraint = 50
-  host "int" VRP_Constraint = 150
-  host "int" AEI_Constraint = 900
-  host "int" LRI_Constraint = 1100
-  host "int" URI_Constraint = 600
-//  host "int" AVI_Constraint = AVI_VALUE
-//  host "int" PVARP_Constraint = PVARP_VALUE
-//  host "int" VRP_Constraint = VRP_VALUE
-//  host "int" AEI_Constraint = AEI_VALUE
-//  host "int" LRI_Constraint = LRI_VALUE
-//  host "int" URI_Constraint = URI_VALUE
+  host "int" AVI_Constraint = `AVI_VALUE`
+  host "int" PVARP_Constraint = `PVARP_VALUE`
+  host "int" VRP_Constraint = `VRP_VALUE`
+  host "int" AEI_Constraint = `AEI_VALUE`
+  host "int" LRI_Constraint = `LRI_VALUE`
+  host "int" URI_Constraint = `URI_VALUE`
 
   region AVI {
     clock cAVI = 0

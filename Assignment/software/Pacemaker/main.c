@@ -2,6 +2,7 @@
 #include <system.h> // to use the symbolic names
 #include <alt_types.h> // alt_u32 is a kind of alt_types
 #include <altera_avalon_pio_regs.h> // to use PIO functions
+#include <stdint.h>
 
 #include "uart.h"
 #include "lcd.h"
@@ -11,6 +12,10 @@
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
 void reset_leds();
+alt_u32 timerISR(void* context);
+
+TickData tickData;
+
 
 int main()
 {
@@ -18,27 +23,68 @@ int main()
 	printf("Hello from Nios II!\n");
 	// start a non blocking UART with read and write
 	setup_keys();
-	setup_uart();
+	//setup_uart();
 	setup_lcd();
 
 	write_to_lcd("hello \n%s %s", "joshua", "morley");
 
-	TickData tickData;
 	reset(&tickData);
 	tick(&tickData); // init tick
 
+	// Timer Init
+	alt_alarm ticker;
+	uint64_t systemTime = 0;
+	void* timerContext = (void*) &systemTime;
+	alt_alarm_start(&ticker, 1, timerISR, timerContext);
+	tickData.deltaT = 1;
 
 	while(1) {
-		check_uart();
+		//check_uart();
 
 
 
 	}
 
 	// close the non blocking UART with read and write
-	close_uart();
+	//close_uart();
 	close_lcd();
 	return 0;
+}
+
+alt_u32 timerISR(void* context){
+
+	tickData.VS = VSBuffer;
+	tickData.AS = ASBuffer;
+
+	if (tickData.VS){
+		printf("VS\n");
+	}
+
+	if (tickData.AS){
+		printf("AS\n");
+	}
+
+	VSBuffer = 0;
+	ASBuffer = 0;
+
+
+
+	tick(&tickData);
+
+
+
+
+	if (tickData.AP){
+		printf("111\n");
+		ap_light_timer();
+	}
+
+	if (tickData.VP){
+		printf("222\n");
+		vp_light_timer();
+	}
+
+	return 1; // next tick is after 1ms
 }
 
 void reset_leds(){
@@ -52,13 +98,11 @@ void key_interrupt(void* context, alt_u32 id) {
 	(*temp) = IORD_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE);
 	// clear the edge capture register
 	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
-	printf("button: %i\n", *temp);
 	if (*temp == 1){
-		vp_light_timer();
+		VSBuffer = 1;
 	}
 	if (*temp == 2){
-		ap_light_timer();
-
+		ASBuffer = 1;
 	}
 }
 

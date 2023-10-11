@@ -1,5 +1,5 @@
-#ifndef SCCHARTS_H
-#define SCCHARTS_H
+#ifndef PACEMAKER_H
+#define PACEMAKER_H
 /*
  * Automatically generated C code by
  * KIELER SCCharts - The Key to Efficient Modeling

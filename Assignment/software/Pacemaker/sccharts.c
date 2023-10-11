@@ -362,12 +362,12 @@ void logic(TickData* d) {
 void reset(TickData* d) {
   d->_GO = 1;
   d->_TERM = 0;
-  d->AVI_Constraint = 300;
-  d->PVARP_Constraint = 50;
-  d->VRP_Constraint = 150;
-  d->AEI_Constraint = 900;
-  d->LRI_Constraint = 1100;
-  d->URI_Constraint = 600;
+  d->AVI_Constraint = AVI_VALUE;
+  d->PVARP_Constraint = PVARP_VALUE;
+  d->VRP_Constraint = VRP_VALUE;
+  d->AEI_Constraint = AEI_VALUE;
+  d->LRI_Constraint = LRI_VALUE;
+  d->URI_Constraint = URI_VALUE;
   d->_region0_AVI_cAVI = 0;
   d->_region1_PVARP_cPVARP = 0;
   d->_region2_VRP_cVRP = 0;

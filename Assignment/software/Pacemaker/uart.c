@@ -11,6 +11,9 @@
 
 FILE* uart;
 
+uint8_t ASBuffer = 0;
+uint8_t VSBuffer = 0;
+
 void setup_uart(){
 	uart = open(JTAG_UART_NAME,(O_NONBLOCK | O_RDWR));
 
@@ -35,10 +38,11 @@ void check_uart(){
 		for (int i = 0; i < length; i++){
 			if (uartBuffer[i] == 'V'){
 				printf("--V--\n");
+				VSBuffer = 1;
 				vp_light_timer();
 			} else if(uartBuffer[i] == 'A'){
 				printf("--A--\n");
-				ap_light_timer();
+				ASBuffer = 1;
 			}
 		}
 	}

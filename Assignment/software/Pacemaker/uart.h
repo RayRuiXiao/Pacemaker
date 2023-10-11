@@ -11,8 +11,11 @@
 #include <stdio.h>
 #include <system.h> // to use the symbolic names
 #include <fcntl.h>
+#include <stdint.h>
 
-uint8
+
+uint8_t ASBuffer;
+uint8_t VSBuffer;
 
 void setup_uart();
 void check_uart();
