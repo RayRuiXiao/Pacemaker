@@ -146,6 +146,7 @@ C_SRCS += main.c
 C_SRCS += uart.c
 C_SRCS += timers.c
 C_SRCS += lcd.c
+C_SRCS += sccharts.c
 CXX_SRCS :=
 ASM_SRCS :=
 

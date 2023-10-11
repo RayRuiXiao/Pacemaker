@@ -7,10 +7,11 @@
 
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
+void reset_leds();
 
 int main()
 {
-	reset();
+	reset_leds();
 	printf("Hello from Nios II!\n");
 	// start a non blocking UART with read and write
 	setup_keys();
@@ -29,7 +30,7 @@ int main()
 	return 0;
 }
 
-void reset(){
+void reset_leds(){
 	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_RED_BASE, 0x0);
 	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_GREEN_BASE, 0x0);
 }
