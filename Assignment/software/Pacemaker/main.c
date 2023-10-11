@@ -9,12 +9,19 @@
 #include "timers.h"
 #include "sccharts.h"
 
+#define UART_MODE IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & (1<<0)
+
+enum MODE {UART = 1, BUTTON = 0};
+
+
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
 void reset_leds();
 alt_u32 timerISR(void* context);
 
 TickData tickData;
+
+enum MODE mode = UART;
 
 
 int main()
@@ -39,8 +46,27 @@ int main()
 	tickData.deltaT = 1;
 
 	while(1) {
-		check_uart();
+		if (UART_MODE) {
+			check_uart();
 
+			if (mode != UART){
+				// disable interrupts for all buttons
+				IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x0);
+				write_to_lcd("PaceMaker\n%s mode", "UART");
+
+				mode = UART;
+			}
+		} else {
+			if (mode != BUTTON){
+				// clears the edge capture register
+				IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
+				// enable interrupts for all buttons
+				IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
+
+				write_to_lcd("PaceMaker\n%s mode", "BUTTON");
+				mode = BUTTON;
+			}
+		}
 	}
 
 	// close the non blocking UART with read and write
