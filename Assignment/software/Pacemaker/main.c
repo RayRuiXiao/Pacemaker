@@ -3,6 +3,7 @@
 #include <alt_types.h> // alt_u32 is a kind of alt_types
 #include <altera_avalon_pio_regs.h> // to use PIO functions
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "uart.h"
 #include "lcd.h"
@@ -13,6 +14,8 @@
 
 enum MODE {UART = 1, BUTTON = 0};
 
+bool VP = false;
+bool AP = false;
 
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
@@ -20,6 +23,7 @@ void reset_leds();
 alt_u32 timerISR(void* context);
 
 TickData tickData;
+alt_alarm ticker;
 
 enum MODE mode = UART;
 
@@ -30,42 +34,58 @@ int main()
 	printf("Hello from Nios II!\n");
 	// start a non blocking UART with read and write
 	setup_keys();
-	setup_uart();
 	setup_lcd();
 
 	write_to_lcd("hello \n%s %s", "joshua", "morley");
 
-	reset(&tickData);
-	tick(&tickData); // init tick
-
-	// Timer Init
-	alt_alarm ticker;
-	uint64_t systemTime = 0;
-	void* timerContext = (void*) &systemTime;
-	alt_alarm_start(&ticker, 1, timerISR, timerContext);
-	tickData.deltaT = 1;
 
 	while(1) {
 		if (UART_MODE) {
-			check_uart();
-
 			if (mode != UART){
+				close_uart();
+				stop_ticker();
+
 				// disable interrupts for all buttons
 				IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x0);
+
 				write_to_lcd("PaceMaker\n%s mode", "UART");
+				printf("UART Enabled\n");
 
 				mode = UART;
+
+				setup_uart();
+				usleep(500); // To remove bouncing
+				start_ticker();
 			}
+			check_uart();
 		} else {
 			if (mode != BUTTON){
+				stop_ticker();
+
 				// clears the edge capture register
 				IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
 				// enable interrupts for all buttons
 				IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
 
+				printf("UART Disabled\n");
 				write_to_lcd("PaceMaker\n%s mode", "BUTTON");
+
 				mode = BUTTON;
+
+				usleep(500); // To remove bouncing
+				start_ticker();
 			}
+		}
+
+		if (AP) {
+			printf("A\n");
+			AP = false;
+		}
+
+
+		if (VP) {
+			printf("V\n");
+			VP = false;
 		}
 	}
 
@@ -74,6 +94,22 @@ int main()
 	close_lcd();
 	return 0;
 }
+
+void start_ticker(){
+	reset(&tickData);
+	tick(&tickData); // init tick
+
+	// Timer Init
+	uint64_t systemTime = 0;
+	void* timerContext = (void*) &systemTime;
+	alt_alarm_start(&ticker, 1, timerISR, timerContext);
+	tickData.deltaT = 1;
+}
+
+void stop_ticker(){
+	alt_alarm_stop(&ticker);
+}
+
 
 alt_u32 timerISR(void* context){
 
@@ -88,10 +124,12 @@ alt_u32 timerISR(void* context){
 
 	if (tickData.AP){
 		ap_light_timer();
+		AP = true;
 	}
 
 	if (tickData.VP){
 		vp_light_timer();
+		VP = true;
 	}
 
 	return 1; // next tick is a fter 1ms

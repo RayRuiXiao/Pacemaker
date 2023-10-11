@@ -19,11 +19,7 @@ void setup_uart(){
 
 	if(!uart){
 		printf("Failed to open UART");
-	} else {
-		printf("UART Started");
-
 	}
-
 }
 
 void check_uart(){
@@ -37,11 +33,8 @@ void check_uart(){
 	if (length > 0) {
 		for (int i = 0; i < length; i++){
 			if (uartBuffer[i] == 'V'){
-				printf("--V--\n");
 				VSBuffer = 1;
-				vp_light_timer();
 			} else if(uartBuffer[i] == 'A'){
-				printf("--A--\n");
 				ASBuffer = 1;
 			}
 		}
