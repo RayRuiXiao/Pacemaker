@@ -14,7 +14,7 @@
 #include <altera_avalon_pio_regs.h> // to use PIO functions
 
 
-#define LED_TIMEOUT 200
+#define LED_TIMEOUT 50
 
 
 void vp_light_timer();

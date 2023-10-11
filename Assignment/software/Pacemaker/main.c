@@ -23,7 +23,7 @@ int main()
 	printf("Hello from Nios II!\n");
 	// start a non blocking UART with read and write
 	setup_keys();
-	//setup_uart();
+	setup_uart();
 	setup_lcd();
 
 	write_to_lcd("hello \n%s %s", "joshua", "morley");
@@ -39,14 +39,12 @@ int main()
 	tickData.deltaT = 1;
 
 	while(1) {
-		//check_uart();
-
-
+		check_uart();
 
 	}
 
 	// close the non blocking UART with read and write
-	//close_uart();
+	close_uart();
 	close_lcd();
 	return 0;
 }
@@ -56,35 +54,21 @@ alt_u32 timerISR(void* context){
 	tickData.VS = VSBuffer;
 	tickData.AS = ASBuffer;
 
-	if (tickData.VS){
-		printf("VS\n");
-	}
-
-	if (tickData.AS){
-		printf("AS\n");
-	}
-
 	VSBuffer = 0;
 	ASBuffer = 0;
-
-
 
 	tick(&tickData);
 
 
-
-
 	if (tickData.AP){
-		printf("111\n");
 		ap_light_timer();
 	}
 
 	if (tickData.VP){
-		printf("222\n");
 		vp_light_timer();
 	}
 
-	return 1; // next tick is after 1ms
+	return 1; // next tick is a fter 1ms
 }
 
 void reset_leds(){
