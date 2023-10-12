@@ -12,7 +12,7 @@
 
 #define UART_MODE IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & (1<<0)
 
-enum MODE {UART = 1, BUTTON = 0};
+enum MODE {UART = 0, BUTTON = 1, UNSET = 2};
 
 bool VP = false;
 bool AP = false;
@@ -25,7 +25,7 @@ alt_u32 timerISR(void* context);
 TickData tickData;
 alt_alarm ticker;
 
-enum MODE mode = UART;
+enum MODE mode = UNSET;
 
 
 int main()
@@ -42,9 +42,8 @@ int main()
 	while(1) {
 		if (UART_MODE) {
 			if (mode != UART){
-				close_uart();
 				stop_ticker();
-
+				close_uart();
 				// disable interrupts for all buttons
 				IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x0);
 
@@ -53,15 +52,16 @@ int main()
 
 				mode = UART;
 
+
+				usleep(50); // To remove bouncing
 				setup_uart();
-				usleep(500); // To remove bouncing
 				start_ticker();
 			}
 			check_uart();
 		} else {
 			if (mode != BUTTON){
+				close_uart();
 				stop_ticker();
-
 				// clears the edge capture register
 				IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
 				// enable interrupts for all buttons
@@ -72,19 +72,19 @@ int main()
 
 				mode = BUTTON;
 
-				usleep(500); // To remove bouncing
+				usleep(50); // To remove bouncing
 				start_ticker();
 			}
 		}
 
 		if (AP) {
-			printf("A\n");
+			print_uart("A\n");
 			AP = false;
 		}
 
 
 		if (VP) {
-			printf("V\n");
+			print_uart("V\n");
 			VP = false;
 		}
 	}

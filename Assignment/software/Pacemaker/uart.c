@@ -15,10 +15,12 @@ uint8_t ASBuffer = 0;
 uint8_t VSBuffer = 0;
 
 void setup_uart(){
-	uart = open(JTAG_UART_NAME,(O_NONBLOCK | O_RDWR));
+	uart = open(UART_NAME,(O_NONBLOCK | O_RDWR));
 
 	if(!uart){
-		printf("Failed to open UART");
+		printf("Failed to open UART\n");
+	} else {
+		printf("setup uart\n");
 	}
 }
 
@@ -36,9 +38,24 @@ void check_uart(){
 				VSBuffer = 1;
 			} else if(uartBuffer[i] == 'A'){
 				ASBuffer = 1;
+
 			}
 		}
 	}
+}
+
+void print_uart(const char *format, ...){
+	if(!uart)
+		return;
+
+	// Use variadic arguments to print the formatted string
+	va_list args;
+	va_start(args, format);
+	vfprintf(uart, format, args);
+	va_end(args);
+
+	// Print a newline character
+	fprintf(uart, "\n");
 }
 
 void close_uart(){
