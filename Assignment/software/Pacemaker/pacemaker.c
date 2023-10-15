@@ -95,7 +95,6 @@ void c_tick() {
         if ((AS || C_AP) && PVARPState != dPVARP) {
             AVIState = dAVI;
             cAVI = 0;
-            C_AP = 0;
         }
         break;
     case dAVI:
@@ -117,7 +116,6 @@ void c_tick() {
             PVARPState = dPVARP;
             cPVARP = 0;
             VS = 0;
-            C_VP = 0;
         }
         break;
     case dPVARP:
@@ -136,7 +134,6 @@ void c_tick() {
         if (VS || C_VP) {
             VRPState = dVRP;
             cVRP = 0;
-            C_VP = 0;
         }
         break;
     case dVRP:
@@ -155,7 +152,6 @@ void c_tick() {
         if ((VS || C_VP) && VRPState != dVRP) {
             AEIState = dAEI;
             cAEI = 0;
-            C_VP = 0;
         }
         break;
     case dAEI:
@@ -177,7 +173,6 @@ void c_tick() {
         if ((VS || C_VP) && VRPState != dVRP) {
             LRIState = dLRI;
             cLRI = 0;
-            C_VP = 0;
         }
         break;
     case dLRI:
@@ -186,7 +181,6 @@ void c_tick() {
             LRIState = dLRI;
         } else if ((VS || C_VP) && VRPState != dVRP){
         	LRIState = dLRI;
-        	C_VP = 0;
         } else if (cLRI >= LRI_VALUE){
         	cLRI = 0;
         }
@@ -202,7 +196,6 @@ void c_tick() {
         if ((VS || C_VP) && VRPState != dVRP) {
             URIState = dURI;
             cURI = 0;
-            C_VP = 0;
         }
         break;
     case dURI:
