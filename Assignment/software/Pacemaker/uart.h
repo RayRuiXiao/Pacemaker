@@ -20,7 +20,9 @@ uint8_t VSBuffer;
 
 void setup_uart();
 void check_uart();
-void print_uart(const char *format, ...);
 void close_uart();
+
+void print_v();
+void print_a();
 
 #endif /* UART_H_ */

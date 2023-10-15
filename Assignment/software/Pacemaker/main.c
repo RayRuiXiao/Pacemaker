@@ -78,13 +78,14 @@ int main()
 		}
 
 		if (AP) {
-			print_uart("A\n");
+			//print_uart("A\n");
+			print_a();
 			AP = false;
 		}
 
 
 		if (VP) {
-			print_uart("V\n");
+			print_v();
 			VP = false;
 		}
 	}

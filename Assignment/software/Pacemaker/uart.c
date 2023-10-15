@@ -44,18 +44,18 @@ void check_uart(){
 	}
 }
 
-void print_uart(const char *format, ...){
+void print_v(){
 	if(!uart)
-		return;
+			return;
+	char v = 'V';
+	write(uart, &v, 1);
+}
 
-	// Use variadic arguments to print the formatted string
-	va_list args;
-	va_start(args, format);
-	vfprintf(uart, format, args);
-	va_end(args);
-
-	// Print a newline character
-	fprintf(uart, "\n");
+void print_a(){
+	if(!uart)
+			return;
+	char a = 'A';
+	write(uart, &a, 1);
 }
 
 void close_uart(){
