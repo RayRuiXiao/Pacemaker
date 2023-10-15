@@ -147,6 +147,7 @@ C_SRCS += uart.c
 C_SRCS += timers.c
 C_SRCS += lcd.c
 C_SRCS += sccharts.c
+C_SRCS += pacemaker.c
 CXX_SRCS :=
 ASM_SRCS :=
 

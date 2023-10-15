@@ -58,6 +58,8 @@ void print_a(){
 	write(uart, &a, 1);
 }
 
+
+
 void close_uart(){
 	close(uart);
 }

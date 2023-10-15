@@ -9,10 +9,13 @@
 #include "lcd.h"
 #include "timers.h"
 #include "sccharts.h"
+#include "pacemaker.h"
 
 #define UART_MODE IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & (1<<0)
 
-enum MODE {UART = 0, BUTTON = 1, UNSET = 2};
+enum MODE {UART = 0, BUTTON = 1, UNSET = 2, RESET = 3};
+
+enum IMPLEMENTATIONS {SCCHARTS, PURE_C};
 
 bool VP = false;
 bool AP = false;
@@ -20,12 +23,15 @@ bool AP = false;
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
 void reset_leds();
+void start_ticker();
+void stop_ticker();
 alt_u32 timerISR(void* context);
 
 TickData tickData;
 alt_alarm ticker;
 
 enum MODE mode = UNSET;
+enum IMPLEMENTATIONS implementation = PURE_C;
 
 
 int main()
@@ -99,12 +105,15 @@ int main()
 void start_ticker(){
 	reset(&tickData);
 	tick(&tickData); // init tick
+	c_reset();
 
 	// Timer Init
 	uint64_t systemTime = 0;
 	void* timerContext = (void*) &systemTime;
 	alt_alarm_start(&ticker, 1, timerISR, timerContext);
 	tickData.deltaT = 1;
+
+
 }
 
 void stop_ticker(){
@@ -114,24 +123,49 @@ void stop_ticker(){
 
 alt_u32 timerISR(void* context){
 
-	tickData.VS = VSBuffer;
-	tickData.AS = ASBuffer;
+	switch (implementation){
+	case SCCHARTS:
+		tickData.VS = VSBuffer;
+		tickData.AS = ASBuffer;
+
+
+
+		tick(&tickData);
+
+
+		if (tickData.AP){
+			ap_light_timer();
+			AP = true;
+		}
+
+		if (tickData.VP){
+			vp_light_timer();
+			VP = true;
+		}
+		break;
+	case PURE_C:
+		c_tick();
+
+		if (C_AP){
+			ap_light_timer();
+			AP = true;
+			C_AP = 0;
+		}
+
+		if (C_VP){
+			vp_light_timer();
+			VP = true;
+			C_VP = 0;
+
+		}
+
+		break;
+	}
+
 
 	VSBuffer = 0;
 	ASBuffer = 0;
 
-	tick(&tickData);
-
-
-	if (tickData.AP){
-		ap_light_timer();
-		AP = true;
-	}
-
-	if (tickData.VP){
-		vp_light_timer();
-		VP = true;
-	}
 
 	return 1; // next tick is a fter 1ms
 }
