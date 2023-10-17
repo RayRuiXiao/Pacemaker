@@ -14,37 +14,6 @@ int AEI_Constraint = AEI_VALUE;
 int LRI_Constraint = LRI_VALUE;
 int URI_Constraint = URI_VALUE;
 
-enum AVIStates {
-    wAVI,
-    dAVI
-};
-
-enum PVARPStates {
-    wPVARP,
-    dPVARP
-};
-
-enum VRPStates {
-    wVRP,
-    dVRP
-};
-
-enum AEIStates {
-    wAEI,
-    dAEI
-};
-
-enum URIStates {
-    wURI,
-    dURI
-};
-
-enum LRIStates {
-    wLRI,
-    dLRI
-};
-
-
 int AS, VS;
 
 // States up counter initialization
@@ -73,6 +42,13 @@ void c_reset() {
 	URIState = wURI;
 	LRIState = wLRI;
 
+	AVIBufferState = wAVI;
+	PVARPBufferState = wPVARP;
+	VRPBufferState = wVRP;
+	AEIBufferState = wAEI;
+	URIBufferState = wURI;
+	LRIBufferState = wLRI;
+
 	// initialize counters
 	cAVI = 0;
 	cPVARP = 0;
@@ -93,16 +69,17 @@ void c_tick() {
     switch (AVIState) {
     case wAVI:
         if ((AS || C_AP) && PVARPState != dPVARP) {
-            AVIState = dAVI;
+            AVIBufferState = dAVI;
             cAVI = 0;
         }
         break;
     case dAVI:
-        if ((cAVI >= AVI_Constraint && URIState != dURI) || LRIState != dLRI) {
+        if (cAVI >= AVI_Constraint && URIState != dURI) {
             C_VP = 1;
-            AVIState = wAVI;
-        } else if (VS == 1){
-        	AVIState = wAVI;
+            AVIBufferState = wAVI;
+        }
+        if (VS){
+        	AVIBufferState = wAVI;
         }
         cAVI += 1;
         break;
@@ -113,14 +90,13 @@ void c_tick() {
     switch (PVARPState) {
     case wPVARP:
         if (VS || C_VP) {
-            PVARPState = dPVARP;
+            PVARPBufferState = dPVARP;
             cPVARP = 0;
-            VS = 0;
         }
         break;
     case dPVARP:
-        if (cPVARP >= AVI_Constraint) {
-            PVARPState = wPVARP;
+        if (cPVARP >= PVARP_Constraint) {
+            PVARPBufferState = wPVARP;
         }
         cPVARP += 1;
         break;
@@ -132,13 +108,13 @@ void c_tick() {
     switch (VRPState) {
     case wVRP:
         if (VS || C_VP) {
-            VRPState = dVRP;
+            VRPBufferState = dVRP;
             cVRP = 0;
         }
         break;
     case dVRP:
         if (cVRP >= VRP_Constraint) {
-            VRPState = wVRP;
+            VRPBufferState = wVRP;
         }
         cVRP += 1;
         break;
@@ -150,16 +126,17 @@ void c_tick() {
     switch (AEIState) {
     case wAEI:
         if ((VS || C_VP) && VRPState != dVRP) {
-            AEIState = dAEI;
+            AEIBufferState = dAEI;
             cAEI = 0;
         }
         break;
     case dAEI:
         if (cAEI >= AEI_Constraint) {
             C_AP = 1;
-            AEIState = wAEI;
-        } else if (AS == 1 && PVARPState != dPVARP){
-			AEIState = wAEI;
+            AEIBufferState = wAEI;
+        }
+        if (AS && PVARPState != dPVARP){
+			AEIBufferState = wAEI;
         }
         cAEI += 1;
         break;
@@ -171,17 +148,18 @@ void c_tick() {
     switch (LRIState) {
     case wLRI:
         if ((VS || C_VP) && VRPState != dVRP) {
-            LRIState = dLRI;
+            LRIBufferState = dLRI;
             cLRI = 0;
         }
         break;
     case dLRI:
         if (cLRI >= LRI_Constraint) {
             C_VP = 1;
-            LRIState = dLRI;
-        } else if ((VS || C_VP) && VRPState != dVRP){
-        	LRIState = dLRI;
-        } else if (cLRI >= LRI_VALUE){
+            LRIBufferState = dLRI;
+            cLRI = 0;
+        }
+        if ((VS || C_VP) && VRPState != dVRP){
+        	LRIBufferState = dLRI;
         	cLRI = 0;
         }
         cLRI += 1;
@@ -194,18 +172,33 @@ void c_tick() {
     switch (URIState) {
     case wURI:
         if ((VS || C_VP) && VRPState != dVRP) {
-            URIState = dURI;
+            URIBufferState = dURI;
             cURI = 0;
         }
         break;
     case dURI:
         if (cURI >= URI_Constraint) {
-            URIState = wURI;
+            URIBufferState = wURI;
         }
         cURI += 1;
         break;
     }
     // ------------- End URIState -------------
 
+	AVIState = AVIBufferState;
+	PVARPState = PVARPBufferState;
+	VRPState = VRPBufferState;
+	AEIState = AEIBufferState;
+	URIState = URIBufferState;
+	LRIState = LRIBufferState;
+
+
+	if (C_AP == 2){
+		C_AP = 0;
+	}
+
+	if (C_VP == 2){
+		C_VP = 0;
+	}
 
 }

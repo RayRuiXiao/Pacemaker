@@ -20,6 +20,8 @@ enum IMPLEMENTATIONS {SCCHARTS, PURE_C};
 bool VP = false;
 bool AP = false;
 
+bool print_values = false;
+
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
 void reset_leds();
@@ -94,7 +96,14 @@ int main()
 			print_v();
 			VP = false;
 		}
+
+
+		if (print_values) {
+			//printf("AVI %d: %d, PVARP %d: %d, VRP %d: %d, AEI %d: %d, URI%d: %d, LRI%d: %d\n",AVIState, cAVI,PVARPState, cPVARP, VRPState, cVRP, AEIState, cAEI,URIState, cURI,LRIState, cLRI);
+			print_values = false;
+		}
 	}
+
 
 	// close the non blocking UART with read and write
 	close_uart();
@@ -112,7 +121,6 @@ void start_ticker(){
 	void* timerContext = (void*) &systemTime;
 	alt_alarm_start(&ticker, 1, timerISR, timerContext);
 	tickData.deltaT = 1;
-
 
 }
 
@@ -149,15 +157,17 @@ alt_u32 timerISR(void* context){
 		if (C_AP){
 			ap_light_timer();
 			AP = true;
-			C_AP = 0;
+			C_AP += 1;
 		}
 
 		if (C_VP){
 			vp_light_timer();
 			VP = true;
-			C_VP = 0;
+			C_VP += 1;
 
 		}
+
+		print_values = true;
 
 		break;
 	}
