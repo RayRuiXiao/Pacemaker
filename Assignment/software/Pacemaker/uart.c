@@ -15,7 +15,11 @@ uint8_t ASBuffer = 0;
 uint8_t VSBuffer = 0;
 
 void setup_uart(){
-	uart = open(UART_NAME,(O_NONBLOCK | O_RDWR));
+	if (!uart){
+
+		uart = open(UART_NAME,(O_NONBLOCK | O_RDWR));
+	}
+
 
 	if(!uart){
 		printf("Failed to open UART\n");

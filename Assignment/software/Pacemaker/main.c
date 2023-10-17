@@ -12,16 +12,21 @@
 #include "pacemaker.h"
 
 #define UART_MODE IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & (1<<0)
+#define SCCHARTS_MODE IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & (1<<1)
+#define HALF_SCREEN_WIDTH 8
+#define PRINT
 
 enum MODE {UART = 0, BUTTON = 1, UNSET = 2, RESET = 3};
 
-enum IMPLEMENTATIONS {SCCHARTS, PURE_C};
+enum IMPLEMENTATIONS {SCCHARTS, PURE_C, UNDEFINED};
 
 bool VP = false;
 bool AP = false;
 
+bool ticker_started = false;
+#ifdef PRINT
 bool print_values = false;
-
+#endif
 void setup_keys();
 void key_interrupt(void* context, alt_u32 id);
 void reset_leds();
@@ -33,33 +38,31 @@ TickData tickData;
 alt_alarm ticker;
 
 enum MODE mode = UNSET;
-enum IMPLEMENTATIONS implementation = PURE_C;
+enum IMPLEMENTATIONS implementation = UNDEFINED;
 
 
 int main()
 {
 	reset_leds();
-	printf("Hello from Nios II!\n");
-	// start a non blocking UART with read and write
+	printf("Hello from Pacemaker!\n");
+
 	setup_keys();
 	setup_lcd();
 
 	write_to_lcd("hello \n%s %s", "joshua", "morley");
 
-
 	while(1) {
 		if (UART_MODE) {
 			if (mode != UART){
 				stop_ticker();
-				close_uart();
+				//close_uart();
 				// disable interrupts for all buttons
 				IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x0);
 
-				write_to_lcd("PaceMaker\n%s mode", "UART");
 				printf("UART Enabled\n");
 
 				mode = UART;
-
+				implementation = UNDEFINED;
 
 				usleep(50); // To remove bouncing
 				setup_uart();
@@ -68,7 +71,7 @@ int main()
 			check_uart();
 		} else {
 			if (mode != BUTTON){
-				close_uart();
+				//close_uart();
 				stop_ticker();
 				// clears the edge capture register
 				IOWR_ALTERA_AVALON_PIO_EDGE_CAP(KEYS_BASE, 0);
@@ -76,9 +79,9 @@ int main()
 				IOWR_ALTERA_AVALON_PIO_IRQ_MASK(KEYS_BASE, 0x7);
 
 				printf("UART Disabled\n");
-				write_to_lcd("PaceMaker\n%s mode", "BUTTON");
 
 				mode = BUTTON;
+				implementation = UNDEFINED;
 
 				usleep(50); // To remove bouncing
 				start_ticker();
@@ -86,7 +89,6 @@ int main()
 		}
 
 		if (AP) {
-			//print_uart("A\n");
 			print_a();
 			AP = false;
 		}
@@ -97,12 +99,13 @@ int main()
 			VP = false;
 		}
 
-
+#ifdef PRINT
 		if (print_values) {
-			//printf("AVI %d: %d, PVARP %d: %d, VRP %d: %d, AEI %d: %d, URI%d: %d, LRI%d: %d\n",AVIState, cAVI,PVARPState, cPVARP, VRPState, cVRP, AEIState, cAEI,URIState, cURI,LRIState, cLRI);
+			printf("AVI %d: %4d, PVARP %d: %4d, VRP %d: %4d, AEI %d: %4d, URI %d: %4d, LRI %d: %4d\n",AVIState, cAVI, PVARPState, cPVARP, VRPState, cVRP, AEIState, cAEI,URIState, cURI,LRIState, cLRI);
 			print_values = false;
 		}
 	}
+#endif
 
 
 	// close the non blocking UART with read and write
@@ -112,46 +115,64 @@ int main()
 }
 
 void start_ticker(){
-	reset(&tickData);
-	tick(&tickData); // init tick
-	c_reset();
-
 	// Timer Init
-	uint64_t systemTime = 0;
-	void* timerContext = (void*) &systemTime;
-	alt_alarm_start(&ticker, 1, timerISR, timerContext);
-	tickData.deltaT = 1;
+	if (!ticker_started){
+		uint64_t systemTime = 0;
+		void* timerContext = (void*) &systemTime;
+		alt_alarm_start(&ticker, 1, timerISR, timerContext);
+		ticker_started = true;
+		printf("ticker started\n");
+	}
 
 }
 
 void stop_ticker(){
-	alt_alarm_stop(&ticker);
+	 if (ticker_started) {
+		alt_alarm_stop(&ticker);
+		ticker_started = false;
+		printf("ticker stopped\n");
+	 }
 }
 
 
 alt_u32 timerISR(void* context){
 
-	switch (implementation){
-	case SCCHARTS:
-		tickData.VS = VSBuffer;
-		tickData.AS = ASBuffer;
+	if (SCCHARTS_MODE){
+		if (implementation != SCCHARTS){
+			reset(&tickData);
+			tick(&tickData); // init tick
+			tickData.deltaT = 1;
 
+			printf("sccharts version started\n");
+			write_to_lcd("PaceMaker\n%-*s%*s", HALF_SCREEN_WIDTH, "SCCHARTS", HALF_SCREEN_WIDTH,  mode == BUTTON ? "BUTTON" : "UART");
 
+			implementation = SCCHARTS;
+		} else {
+			tickData.VS = VSBuffer;
+			tickData.AS = ASBuffer;
 
-		tick(&tickData);
+			tick(&tickData);
 
+			if (tickData.AP){
+				ap_light_timer();
+				AP = true;
+			}
 
-		if (tickData.AP){
-			ap_light_timer();
-			AP = true;
+			if (tickData.VP){
+				vp_light_timer();
+				VP = true;
+			}
+		}
+	} else {
+		if (implementation != PURE_C){
+			c_reset();
+
+			printf("pure_c version started\n");
+			write_to_lcd("PaceMaker\n%-*s%*s", HALF_SCREEN_WIDTH,  "PURE_C", HALF_SCREEN_WIDTH,  mode == BUTTON ? "BUTTON" : "UART");
+
+			implementation = PURE_C;
 		}
 
-		if (tickData.VP){
-			vp_light_timer();
-			VP = true;
-		}
-		break;
-	case PURE_C:
 		c_tick();
 
 		if (C_AP){
@@ -164,12 +185,10 @@ alt_u32 timerISR(void* context){
 			vp_light_timer();
 			VP = true;
 			C_VP += 1;
-
 		}
-
+#ifdef PRINT
 		print_values = true;
-
-		break;
+#endif
 	}
 
 
