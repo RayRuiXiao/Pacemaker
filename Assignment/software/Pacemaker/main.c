@@ -14,7 +14,7 @@
 #define UART_MODE IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & (1<<0)
 #define SCCHARTS_MODE IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_BASE) & (1<<1)
 #define HALF_SCREEN_WIDTH 8
-#define PRINT
+//#define PRINT
 
 enum MODE {UART = 0, BUTTON = 1, UNSET = 2, RESET = 3};
 
@@ -104,9 +104,8 @@ int main()
 			printf("AVI %d: %4d, PVARP %d: %4d, VRP %d: %4d, AEI %d: %4d, URI %d: %4d, LRI %d: %4d\n",AVIState, cAVI, PVARPState, cPVARP, VRPState, cVRP, AEIState, cAEI,URIState, cURI,LRIState, cLRI);
 			print_values = false;
 		}
-	}
 #endif
-
+	}
 
 	// close the non blocking UART with read and write
 	close_uart();

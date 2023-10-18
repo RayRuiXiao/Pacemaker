@@ -16,6 +16,9 @@ int URI_Constraint = URI_VALUE;
 
 int AS, VS;
 
+#define PRE_VP C_VP == 2
+#define PRE_AP C_AP == 2
+
 // States up counter initialization
 int cAVI = 0;
 int cPVARP = 0;
@@ -68,7 +71,7 @@ void c_tick() {
     // -------------- AVIState ---------------
     switch (AVIState) {
     case wAVI:
-        if ((AS || C_AP) && PVARPState != dPVARP) {
+        if ((AS || PRE_AP) && PVARPState != dPVARP) {
             AVIBufferState = dAVI;
             cAVI = 0;
         }
@@ -89,7 +92,7 @@ void c_tick() {
     // -------------- PVARPState ---------------
     switch (PVARPState) {
     case wPVARP:
-        if (VS || C_VP) {
+        if (VS || PRE_VP) {
             PVARPBufferState = dPVARP;
             cPVARP = 0;
         }
@@ -107,7 +110,7 @@ void c_tick() {
     // -------------- VRPState ---------------
     switch (VRPState) {
     case wVRP:
-        if (VS || C_VP) {
+        if (VS || PRE_VP) {
             VRPBufferState = dVRP;
             cVRP = 0;
         }
@@ -125,7 +128,7 @@ void c_tick() {
     // -------------- AEIState ---------------
     switch (AEIState) {
     case wAEI:
-        if ((VS || C_VP) && VRPState != dVRP) {
+        if ((VS || PRE_VP) && VRPState != dVRP) {
             AEIBufferState = dAEI;
             cAEI = 0;
         }
@@ -147,7 +150,7 @@ void c_tick() {
     // -------------- LRIState ---------------
     switch (LRIState) {
     case wLRI:
-        if ((VS || C_VP) && VRPState != dVRP) {
+        if ((VS || PRE_VP) && VRPState != dVRP) {
             LRIBufferState = dLRI;
             cLRI = 0;
         }
@@ -158,7 +161,7 @@ void c_tick() {
             LRIBufferState = dLRI;
             cLRI = 0;
         }
-        if ((VS || C_VP) && VRPState != dVRP){
+        if ((VS || PRE_VP) && VRPState != dVRP){
         	LRIBufferState = dLRI;
         	cLRI = 0;
         }
@@ -171,7 +174,7 @@ void c_tick() {
     // -------------- URIState ---------------
     switch (URIState) {
     case wURI:
-        if ((VS || C_VP) && VRPState != dVRP) {
+        if ((VS || PRE_VP) && VRPState != dVRP) {
             URIBufferState = dURI;
             cURI = 0;
         }
@@ -193,11 +196,11 @@ void c_tick() {
 	LRIState = LRIBufferState;
 
 
-	if (C_AP == 2){
+	if (PRE_AP){
 		C_AP = 0;
 	}
 
-	if (C_VP == 2){
+	if (PRE_VP){
 		C_VP = 0;
 	}
 
