@@ -1,4 +1,4 @@
-# COMPSYS 303 DDD Pacemaker
+#  DDD Pacemaker
 
 You can find the NIOS project files in the /Assignment folder.
 
